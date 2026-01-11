@@ -34,12 +34,16 @@ export const Map: React.FC<MapProps> = ({
 
   const FitToMarkers: React.FC<{ points: StudyLocation[] }> = ({ points }) => {
     const map = useMap();
+    const hasFit = React.useRef(false);
+
     React.useEffect(() => {
-      if (points && points.length > 0 && !destination) {
+      // Only fit bounds once when points are loaded
+      if (points && points.length > 0 && !destination && !hasFit.current) {
         const bounds = L.latLngBounds(
           points.map((p) => [p.latitude, p.longitude] as [number, number])
         );
         map.fitBounds(bounds.pad(0.2));
+        hasFit.current = true;
       }
     }, [points, map]);
     return null;

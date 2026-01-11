@@ -85,7 +85,7 @@ export const Profile: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24 overflow-y-auto transition-colors">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 pb-24 overflow-y-auto transition-colors">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="relative px-4 py-6 sm:py-8 sm:px-6 lg:px-8">

@@ -1,13 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 
 export default defineConfig({
   server: {
-    host: true, // Enables network access so you can test on your phone
+    host: true,
     port: 5173,
+    https: true,
   },
   plugins: [
+    basicSsl() as any,
     react(),
     VitePWA({
       registerType: "autoUpdate",
@@ -60,7 +63,4 @@ export default defineConfig({
       },
     }),
   ],
-  server: {
-    port: 5173,
-  },
 });

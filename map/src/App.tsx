@@ -46,12 +46,16 @@ function App() {
     }
 
     // Initial location fetch
-    fetchUserLocation();
+    const watchId = fetchUserLocation();
+
+    return () => {
+      if (watchId !== undefined) navigator.geolocation.clearWatch(watchId);
+    };
   }, []);
 
   const fetchUserLocation = () => {
     if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
+      return navigator.geolocation.watchPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
@@ -60,7 +64,11 @@ function App() {
         },
         (error) => {
           console.warn("Geolocation error:", error);
-          // Fallback or IP based location could go here, but for now we just don't set it
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 10000,
+          timeout: 5000,
         }
       );
     }
@@ -97,7 +105,10 @@ function App() {
       case "scan":
         return (
           <QRScanner
-            onCheckInSuccess={() => setCurrentView("profile")}
+            onCheckInSuccess={() => {
+              refetch();
+              setCurrentView("profile");
+            }}
             onClose={() => setCurrentView("explore")}
           />
         );
@@ -170,7 +181,7 @@ function App() {
               </div>
 
               {selectedLocation && (
-                <div className="lg:hidden fixed left-2 right-2 bottom-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl z-30 max-h-[50vh] overflow-y-auto border border-gray-200 dark:border-gray-700 transition-colors">
+                <div className="lg:hidden fixed left-2 right-2 bottom-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl z-[2000] max-h-[50vh] overflow-y-auto border border-gray-200 dark:border-gray-700 transition-colors">
                   <div className="relative">
                     <button
                       onClick={() => setSelectedLocation(undefined)}
