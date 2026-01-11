@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useAuth } from "../contexts/AuthContext";
 import { checkInService } from "../services/checkInService";
-import {
-  gamificationService,
-  DEFAULT_USER_ID,
-} from "../services/gamificationService";
+import { gamificationService } from "../services/gamificationService";
 import { locationService } from "../services/locationService";
 import { CheckIn } from "../types/checkin";
 

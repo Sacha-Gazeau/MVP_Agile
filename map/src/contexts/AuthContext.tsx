@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 interface AuthContextType {
   userId: string;
   isAdmin: boolean;
-  loginRequests: number;
   loginAsAdmin: (password: string) => boolean;
   logoutAdmin: () => void;
 }
@@ -15,7 +14,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [userId, setUserId] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [loginRequests, setLoginRequests] = useState(0);
 
   useEffect(() => {
     // Guest User Logic
@@ -50,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ userId, isAdmin, loginAsAdmin, logoutAdmin, loginRequests }}
+      value={{ userId, isAdmin, loginAsAdmin, logoutAdmin }}
     >
       {children}
     </AuthContext.Provider>
