@@ -2,7 +2,46 @@
 
 A modern Progressive Web App (PWA) to discover peaceful study locations where you can focus in silence.
 
+## 📱 Testing on Your Phone (from Localhost)
+
+### Quick Steps:
+
+1. **Make sure your phone and laptop are on the same WiFi network**
+
+2. **Find your laptop's IP address:**
+
+   - **Windows**: Open CMD and type `ipconfig` - look for "IPv4 Address" (e.g., `192.168.1.100`)
+   - **Mac**: System Preferences → Network → Your WiFi → IP Address
+
+3. **Start the dev server:**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open the app on your phone:**
+
+   - Open your phone's browser
+   - Go to: `http://YOUR_LAPTOP_IP:5173` (e.g., `http://192.168.1.100:5173`)
+   - For QR scanning to work, you may need HTTPS. Try using a tunneling service like `ngrok`:
+     ```bash
+     npx ngrok http 5173
+     ```
+     Then use the `https://` URL it provides on your phone.
+
+5. **Install as PWA (optional):**
+   - On your phone's browser, tap "Add to Home Screen" to install the app
+
+### Troubleshooting:
+
+- **Can't connect?** Check your firewall settings on your laptop
+- **Camera not working?** QR scanning requires HTTPS on mobile. Use ngrok or deploy to a hosting service
+- **Slow?** Make sure both devices are on the same WiFi
+
+---
+
 ## Table of Contents
+
 - [Study Locator PWA](#study-locator-pwa)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
@@ -138,6 +177,7 @@ The app is set up to integrate with study location APIs. Currently uses mock dat
 ### QR Code Module
 
 The `/qrcode` folder contains a standalone web interface for testing and demonstrating the physical check-in process. content includes:
+
 - **index.html**: A searchable list of locations to simulate approaching a location.
 - **qr-checkin.html**: A confirmation page that simulates a successful scan/check-in action.
 - **Standalone CSS/JS**: Independent of the main React app for lightweight deployment on kiosk devices.

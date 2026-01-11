@@ -1,5 +1,5 @@
 import { CheckIn, CheckInStats, LocationCheckInData } from "../types/checkin.ts";
-import { StudyLocation } from "../types/location";
+import { StudyLocation } from "../types/location.ts";
 
 const STORAGE_KEY = "study-spaces-checkins";
 
