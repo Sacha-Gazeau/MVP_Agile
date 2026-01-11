@@ -14,7 +14,7 @@ type View = "explore" | "scan" | "profile" | "admin";
 
 function App() {
   const { isAdmin } = useAuth();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
   const [locationLimit, setLocationLimit] = useState<number>(10);
   const {
     data: locations = [],
@@ -40,12 +40,9 @@ function App() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
-        console.log("Service worker registration skipped");
-      });
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
     }
 
-    // Initial location fetch
     const watchId = fetchUserLocation();
 
     return () => {
