@@ -1,4 +1,8 @@
-import { StudyLocation, LocationsResponse } from "../types/location";
+import {
+  StudyLocation,
+  LocationsResponse,
+  LocationType,
+} from "../types/location";
 import axios from "axios";
 const mockLocations: StudyLocation[] = [
   {
@@ -11,6 +15,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "08:00 - 22:00",
     amenities: ["WiFi", "Power outlets", "Temperature control"],
     quietnessLevel: "very-quiet",
+    type: LocationType.LIBRARY,
   },
   {
     id: "2",
@@ -22,6 +27,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "07:00 - 23:00",
     amenities: ["WiFi", "Printer", "Library access"],
     quietnessLevel: "quiet",
+    type: LocationType.LIBRARY,
   },
   {
     id: "3",
@@ -33,6 +39,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "06:00 - 20:00",
     amenities: ["Natural light", "Fresh air"],
     quietnessLevel: "moderate",
+    type: LocationType.PUBLIC_SPACE,
   },
   {
     id: "4",
@@ -44,6 +51,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "06:00 - 22:00",
     amenities: ["WiFi", "Power outlets", "Soundproof pods"],
     quietnessLevel: "very-quiet",
+    type: LocationType.COWORKING,
   },
   {
     id: "5",
@@ -55,6 +63,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "09:00 - 17:00",
     amenities: ["WiFi", "Tables", "Chairs"],
     quietnessLevel: "quiet",
+    type: LocationType.PUBLIC_SPACE,
   },
   // Amsterdam locations
   {
@@ -67,6 +76,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "10:00 - 22:00",
     amenities: ["WiFi", "Power outlets", "Coffee bar"],
     quietnessLevel: "very-quiet",
+    type: LocationType.LIBRARY,
   },
   {
     id: "7",
@@ -78,6 +88,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "08:00 - 20:00",
     amenities: ["WiFi", "Group rooms", "Silent zones"],
     quietnessLevel: "quiet",
+    type: LocationType.LIBRARY,
   },
   // Paris locations
   {
@@ -90,6 +101,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "09:00 - 18:00",
     amenities: ["WiFi", "Historic reading rooms"],
     quietnessLevel: "very-quiet",
+    type: LocationType.LIBRARY,
   },
   {
     id: "9",
@@ -101,6 +113,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "08:00 - 21:00",
     amenities: ["WiFi", "Research materials", "Power outlets"],
     quietnessLevel: "quiet",
+    type: LocationType.LIBRARY,
   },
   // London locations
   {
@@ -113,6 +126,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "09:30 - 20:00",
     amenities: ["WiFi", "Power outlets", "Lockers"],
     quietnessLevel: "very-quiet",
+    type: LocationType.LIBRARY,
   },
   {
     id: "11",
@@ -124,6 +138,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "07:00 - 23:00",
     amenities: ["WiFi", "24/7 access areas", "Group study"],
     quietnessLevel: "quiet",
+    type: LocationType.LIBRARY,
   },
   // Berlin locations
   {
@@ -136,6 +151,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "09:00 - 21:00",
     amenities: ["WiFi", "Power outlets", "Research areas"],
     quietnessLevel: "very-quiet",
+    type: LocationType.LIBRARY,
   },
   {
     id: "13",
@@ -147,6 +163,7 @@ const mockLocations: StudyLocation[] = [
     openingHours: "08:00 - 22:00",
     amenities: ["WiFi", "Study carrels", "Group rooms"],
     quietnessLevel: "quiet",
+    type: LocationType.LIBRARY,
   },
 ];
 
@@ -166,63 +183,88 @@ export const locationService = {
       }
 
       // Parse the API response - structure: { results: [...] }
-      if (response.data && response.data.results && Array.isArray(response.data.results)) {
-        const locations: StudyLocation[] = response.data.results.map((record: any, index: number) => {
-          // Extract coordinates - check different possible field names
-          let latitude = 51.0537; // Default Gent latitude
-          let longitude = 3.725; // Default Gent longitude
+      if (
+        response.data &&
+        response.data.results &&
+        Array.isArray(response.data.results)
+      ) {
+        const locations: StudyLocation[] = response.data.results.map(
+          (record: any, index: number) => {
+            // Extract coordinates - check different possible field names
+            let latitude = 51.0537; // Default Gent latitude
+            let longitude = 3.725; // Default Gent longitude
 
-          // Try to get coordinates from various possible API response structures
-          if (record.geo_punt && typeof record.geo_punt.lat === "number" && typeof record.geo_punt.lon === "number") {
-            latitude = record.geo_punt.lat;
-            longitude = record.geo_punt.lon;
-          } else if (record.geo_point_2d) {
-            latitude = record.geo_point_2d.lat || latitude;
-            longitude = record.geo_point_2d.lon || longitude;
-          } else if (record.geometry?.coordinates) {
-            // GeoJSON format: [longitude, latitude]
-            longitude = record.geometry.coordinates[0] || longitude;
-            latitude = record.geometry.coordinates[1] || latitude;
-          } else if (record.latitude && record.longitude) {
-            latitude = record.latitude;
-            longitude = record.longitude;
+            // Try to get coordinates from various possible API response structures
+            if (
+              record.geo_punt &&
+              typeof record.geo_punt.lat === "number" &&
+              typeof record.geo_punt.lon === "number"
+            ) {
+              latitude = record.geo_punt.lat;
+              longitude = record.geo_punt.lon;
+            } else if (record.geo_point_2d) {
+              latitude = record.geo_point_2d.lat || latitude;
+              longitude = record.geo_point_2d.lon || longitude;
+            } else if (record.geometry?.coordinates) {
+              // GeoJSON format: [longitude, latitude]
+              longitude = record.geometry.coordinates[0] || longitude;
+              latitude = record.geometry.coordinates[1] || latitude;
+            } else if (record.latitude && record.longitude) {
+              latitude = record.latitude;
+              longitude = record.longitude;
+            }
+
+            // Log all records for debugging
+            console.log(`Location ${index}:`, {
+              name: record.naam,
+              straatnaam: record.straatnaam,
+              huisnummer: record.huisnummer,
+              adres: record.adres,
+              geo_point_2d: record.geo_point_2d,
+              geometry: record.geometry,
+              latitude,
+              longitude,
+            });
+
+            // Address
+            let address = record.adres || "Gent, Belgium";
+            if (!address && record.straatnaam && record.huisnummer) {
+              address = `${record.straatnaam} ${record.huisnummer}, Gent`;
+            } else if (!address && record.straatnaam) {
+              address = `${record.straatnaam}, Gent`;
+            }
+
+            return {
+              id: (
+                record.id ??
+                record.objectid ??
+                `location-${index}`
+              ).toString(),
+              name: record.titel || record.naam || "Study Location",
+              description:
+                record.teaser_text ||
+                record.beschrijving ||
+                "Quiet study space",
+              latitude,
+              longitude,
+              address,
+              capacity: record.totale_capaciteit
+                ? Number(record.totale_capaciteit)
+                : undefined,
+              currentOccupancy:
+                typeof record.gereserveerde_plaatsen !== "undefined"
+                  ? Number(record.gereserveerde_plaatsen)
+                  : undefined,
+              openingHours: record.openingsuren || null,
+              amenities: record.voorzieningen
+                ? record.voorzieningen.split(",").map((a: string) => a.trim())
+                : [record.tag_1, record.tag_2].filter(Boolean),
+              quietnessLevel: "quiet",
+              imageUrl: record.teaser_img_url || record.afbeelding,
+              type: LocationType.QUIET_ZONE,
+            };
           }
-
-          // Log all records for debugging
-          console.log(`Location ${index}:`, {
-            name: record.naam,
-            straatnaam: record.straatnaam,
-            huisnummer: record.huisnummer,
-            adres: record.adres,
-            geo_point_2d: record.geo_point_2d,
-            geometry: record.geometry,
-            latitude,
-            longitude,
-          });
-
-          // Address
-          let address = record.adres || "Gent, Belgium";
-          if (!address && record.straatnaam && record.huisnummer) {
-            address = `${record.straatnaam} ${record.huisnummer}, Gent`;
-          } else if (!address && record.straatnaam) {
-            address = `${record.straatnaam}, Gent`;
-          }
-
-          return {
-            id: (record.id ?? record.objectid ?? `location-${index}`).toString(),
-            name: record.titel || record.naam || "Study Location",
-            description: record.teaser_text || record.beschrijving || "Quiet study space",
-            latitude,
-            longitude,
-            address,
-            capacity: record.totale_capaciteit ? Number(record.totale_capaciteit) : undefined,
-            reservedCount: typeof record.gereserveerde_plaatsen !== "undefined" ? Number(record.gereserveerde_plaatsen) : undefined,
-            openingHours: record.openingsuren || null,
-            amenities: record.voorzieningen ? record.voorzieningen.split(",").map((a: string) => a.trim()) : [record.tag_1, record.tag_2].filter(Boolean),
-            quietnessLevel: "quiet",
-            imageUrl: record.teaser_img_url || record.afbeelding,
-          };
-        });
+        );
 
         console.log(`Loaded ${locations.length} locations from Gent API`);
         console.log("Processed locations:", locations);
@@ -231,7 +273,9 @@ export const locationService = {
           lastUpdated: new Date().toISOString(),
         };
       } else {
-        console.warn("Unexpected API response structure, using fallback mock data");
+        console.warn(
+          "Unexpected API response structure, using fallback mock data"
+        );
         console.warn("Response data keys:", Object.keys(response.data));
         return {
           locations: mockLocations,
@@ -240,7 +284,6 @@ export const locationService = {
       }
     } catch (apiError) {
       console.error("API call failed, falling back to mock data:", apiError);
-      // Fallback to mock data if API is unavailable
       return {
         locations: mockLocations,
         lastUpdated: new Date().toISOString(),
@@ -253,8 +296,9 @@ export const locationService = {
     return response.locations.find((loc) => loc.id === id) || null;
   },
 
-  // Add a location (for future features)
-  async addLocation(location: Omit<StudyLocation, "id">): Promise<StudyLocation> {
+  async addLocation(
+    location: Omit<StudyLocation, "id">
+  ): Promise<StudyLocation> {
     const newLocation: StudyLocation = {
       ...location,
       id: Date.now().toString(),
