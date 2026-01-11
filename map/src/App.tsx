@@ -26,13 +26,60 @@ function App() {
   const [showMap, setShowMap] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Navigation State
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [navDestination, setNavDestination] = useState<StudyLocation | null>(
+    null
+  );
+  const [travelMode, setTravelMode] = useState<"car" | "bike" | "foot">("foot");
+
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {
         console.log("Service worker registration skipped");
       });
     }
+
+    // Initial location fetch
+    fetchUserLocation();
   }, []);
+
+  const fetchUserLocation = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.warn("Geolocation error:", error);
+          // Fallback or IP based location could go here, but for now we just don't set it
+        }
+      );
+    }
+  };
+
+  const startNavigation = (mode: "car" | "bike" | "foot") => {
+    if (!selectedLocation) return;
+
+    setTravelMode(mode);
+    setNavDestination(selectedLocation);
+
+    // Ensure we have user location
+    if (!userLocation) {
+      fetchUserLocation();
+    }
+
+    // On mobile, show map to see route
+    if (window.innerWidth < 768) {
+      setShowMap(true);
+    }
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -94,6 +141,9 @@ function App() {
                     <Map
                       locations={locations}
                       onLocationSelect={setSelectedLocation}
+                      destination={navDestination}
+                      userLocation={userLocation}
+                      travelMode={travelMode}
                     />
                     <button
                       onClick={() => setShowMap(!showMap)}
@@ -109,6 +159,9 @@ function App() {
                 <DetailsPanel
                   location={selectedLocation}
                   isLoading={isLoading}
+                  onNavigate={startNavigation}
+                  isNavigating={!!navDestination}
+                  onCancelNavigation={() => setNavDestination(null)}
                 />
               </div>
 
@@ -124,6 +177,9 @@ function App() {
                     <DetailsPanel
                       location={selectedLocation}
                       isLoading={isLoading}
+                      onNavigate={startNavigation}
+                      isNavigating={!!navDestination}
+                      onCancelNavigation={() => setNavDestination(null)}
                     />
                   </div>
                 </div>

@@ -1,16 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StudyLocation, LocationTypeLabels } from "../types/location";
+import { reviewService } from "../services/reviewService";
+import { Review } from "../types/review";
+import { useAuth } from "../contexts/AuthContext";
 
 interface DetailsPanelProps {
   location?: StudyLocation;
   isLoading?: boolean;
+  onNavigate?: (mode: "car" | "bike" | "foot") => void;
+  isNavigating?: boolean;
+  onCancelNavigation?: () => void;
 }
 
 export const DetailsPanel: React.FC<DetailsPanelProps> = ({
   location,
   isLoading,
+  onNavigate,
+  isNavigating,
+  onCancelNavigation,
 }) => {
+  const { userId } = useAuth();
   const [showDirections, setShowDirections] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (location) {
+      loadReviews();
+      setShowQRCode(false); // Reset when location changes
+    }
+  }, [location]);
+
+  const loadReviews = () => {
+    if (location) {
+      setReviews(reviewService.getReviewsForLocation(location.id));
+    }
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!location || !userId) return;
+
+    setIsSubmittingReview(true);
+    reviewService.addReview(
+      location.id,
+      userId,
+      newReview.rating,
+      newReview.comment
+    );
+    setNewReview({ rating: 5, comment: "" });
+    loadReviews();
+    setIsSubmittingReview(false);
+  };
+
+  const getGoogleMapsUrl = () => {
+    if (!location) return "";
+    return `https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`;
+  };
 
   if (isLoading) {
     return (
@@ -86,12 +134,75 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({
               Location
             </h3>
             <p className="text-gray-600 text-sm">{location.address}</p>
-            <button
-              onClick={() => setShowDirections(!showDirections)}
-              className="mt-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
-            >
-              {showDirections ? "Hide" : "Get"} directions
-            </button>
+            <div className="flex flex-col gap-2 mt-2">
+              {!isNavigating ? (
+                <div className="flex gap-2 bg-gray-50 p-2 rounded">
+                  <span className="text-xs font-semibold text-gray-500 py-1">
+                    Navigate:
+                  </span>
+                  <button
+                    onClick={() => onNavigate?.("foot")}
+                    className="text-xl"
+                    title="Walk"
+                  >
+                    🚶
+                  </button>
+                  <button
+                    onClick={() => onNavigate?.("bike")}
+                    className="text-xl"
+                    title="Bike"
+                  >
+                    🚲
+                  </button>
+                  <button
+                    onClick={() => onNavigate?.("car")}
+                    className="text-xl"
+                    title="Car"
+                  >
+                    🚗
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={onCancelNavigation}
+                  className="bg-red-50 text-red-600 px-3 py-1 rounded text-sm font-medium hover:bg-red-100"
+                >
+                  Stop Navigation
+                </button>
+              )}
+
+              <div className="flex gap-2">
+                <a
+                  href={getGoogleMapsUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center"
+                >
+                  Open in Google Maps ↗
+                </a>
+                <button
+                  onClick={() => setShowQRCode(!showQRCode)}
+                  className="text-primary-600 hover:text-primary-700 font-medium text-sm border-l border-gray-300 pl-2 ml-2"
+                >
+                  {showQRCode ? "Hide" : "Show"} QR Code
+                </button>
+              </div>
+            </div>
+            {showQRCode && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg flex flex-col items-center">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${location.id}`}
+                  alt="Location QR Code"
+                  className="w-32 h-32 mb-2"
+                />
+                <p className="text-xs text-gray-500 text-center">
+                  Scan with the app scanner to check-in
+                </p>
+                <div className="mt-2 text-xs text-gray-400 bg-white p-1 rounded border">
+                  Debug ID: {location.id}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -130,6 +241,83 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({
             <p className="text-gray-600 text-sm">{location.capacity} places</p>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <div className="border-t pt-4 mt-6">
+          <h3 className="font-bold text-gray-900 mb-3 text-lg">Reviews</h3>
+
+          {/* Add Review Form */}
+          <form
+            onSubmit={handleSubmitReview}
+            className="mb-6 bg-gray-50 p-3 rounded-lg"
+          >
+            <h4 className="text-sm font-semibold mb-2">Write a review</h4>
+            <div className="flex items-center mb-2">
+              <span className="text-xs mr-2 text-gray-600">Rating:</span>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  type="button"
+                  key={star}
+                  onClick={() => setNewReview({ ...newReview, rating: star })}
+                  className={`text-lg focus:outline-none ${
+                    star <= newReview.rating
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={newReview.comment}
+              onChange={(e) =>
+                setNewReview({ ...newReview, comment: e.target.value })
+              }
+              placeholder="Share your experience..."
+              className="w-full text-sm p-2 border border-gray-300 rounded mb-2 focus:ring-1 focus:ring-primary-500"
+              rows={2}
+              required
+            />
+            <button
+              type="submit"
+              disabled={isSubmittingReview}
+              className="w-full bg-primary-600 text-white text-sm py-1.5 rounded hover:bg-primary-700 transition disabled:opacity-50"
+            >
+              Post Review
+            </button>
+          </form>
+
+          {/* Reviews List */}
+          <div className="space-y-4">
+            {reviews.length === 0 ? (
+              <p className="text-gray-500 text-sm italic">
+                No reviews yet. Be the first!
+              </p>
+            ) : (
+              reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="border-b border-gray-100 pb-3 last:border-0"
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-gray-800">
+                      {review.userName}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(review.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex text-yellow-400 text-xs my-1">
+                    {"★".repeat(review.rating)}
+                    {"☆".repeat(5 - review.rating)}
+                  </div>
+                  <p className="text-gray-600 text-sm">{review.comment}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
         {typeof location.currentOccupancy === "number" && location.capacity && (
           <div>
