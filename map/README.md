@@ -1,0 +1,145 @@
+# Study Locator PWA
+
+A modern Progressive Web App (PWA) to discover peaceful study locations where you can focus in silence.
+
+## Features
+
+- 🗺️ **Interactive Map** - Real-time Leaflet map showing study locations
+- 📱 **Responsive Design** - Works seamlessly on mobile, tablet, and desktop
+- 🔍 **Location Details** - Comprehensive information about each study space
+- ⚡ **Fast Data Loading** - TanStack Query for efficient API data management
+- 🎨 **Modern UI** - Clean design with Tailwind CSS
+- 📴 **PWA Support** - Works offline with service worker caching
+- 🚀 **Built with React** - Extensible component architecture
+
+## Tech Stack
+
+- **Frontend Framework**: React 18
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State Management**: TanStack Query v5
+- **Maps**: Leaflet & React Leaflet
+- **HTTP Client**: Axios
+- **Language**: TypeScript
+- **PWA**: Vite PWA Plugin
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 16+ and npm
+
+### Installation
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start the development server:
+
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+The built files will be in the `dist` directory.
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## Project Structure
+
+```
+src/
+├── components/        # React components (Map, LocationCard, etc.)
+├── hooks/            # Custom React hooks (useLocations)
+├── services/         # API service layer
+├── types/            # TypeScript type definitions
+├── App.tsx           # Main application component
+├── main.tsx          # Application entry point
+└── index.css         # Global styles
+
+public/
+└── manifest.json     # PWA manifest file
+```
+
+## API Integration
+
+The app is set up to integrate with study location APIs. Currently uses mock data for development. To connect to a real API:
+
+1. Update the endpoint in `src/services/locationService.ts`
+2. Modify the response handling to match your API structure
+3. The data will automatically be cached and managed by TanStack Query
+
+## Features Explained
+
+### Map Component
+
+- Displays all study locations with markers
+- Click markers to view location details in a popup
+- Responsive to location selection from the sidebar
+
+### Location List
+
+- Vertical list of all available study locations
+- Click to select and view details
+- Visual feedback for selected location
+- Loading states
+
+### Details Panel
+
+- Shows comprehensive information about selected location
+- Displays amenities, hours, and address
+- Responsive: hidden on small screens, visible on desktop
+
+## Customization
+
+### Styling
+
+- Colors and theme in `tailwind.config.js`
+- Global styles in `src/index.css`
+- Component-specific styles using Tailwind classes
+
+### Adding New Features
+
+The component-based architecture makes it easy to:
+
+- Add new screens/pages
+- Create additional components
+- Extend the API service
+- Modify data types
+
+## Performance
+
+- **Code Splitting**: Automatic with Vite
+- **Lazy Loading**: React components can be lazy-loaded
+- **Caching**: TanStack Query caches API responses
+- **Service Worker**: Offline support and asset caching
+
+## PWA Installation
+
+Users can install the app on their device:
+
+- **Desktop**: Click the install icon in the address bar
+- **Mobile**: Use the browser menu → "Install app"
+- **Standalone**: Launches like a native app
+
+## License
+
+MIT
+
+## Support
+
+For issues or feature requests, please create an issue in the project repository.

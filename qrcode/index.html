@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Spaces – Locaties</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="bg">
+  <div class="container">
+    <h1 class="title">Study Spaces Check-in</h1>
+    <p class="subtitle">Kies een studieplek om in te checken.</p>
+
+    <!-- Recherche -->
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="Zoek een plek..." />
+    </div>
+
+    <!-- Filtres amenities -->
+    <div class="filters-container">
+      <div class="filter-title">Filtrer op voorzieningen:</div>
+      <div class="filters-grid">
+        <label class="filter-label">
+          <input type="checkbox" class="filter-checkbox" value="WiFi" />
+          WiFi
+        </label>
+        <label class="filter-label">
+          <input type="checkbox" class="filter-checkbox" value="Stilteplek" />
+          Stilteplek
+        </label>
+        <label class="filter-label">
+          <input type="checkbox" class="filter-checkbox" value="Projecteur" />
+          Projecteur
+        </label>
+        <label class="filter-label">
+          <input type="checkbox" class="filter-checkbox" value="Whiteboard" />
+          Whiteboard
+        </label>
+        <label class="filter-label">
+          <input type="checkbox" class="filter-checkbox" value="Koffie/Thee" />
+          Koffie/Thee
+        </label>
+        <label class="filter-label">
+          <input type="checkbox" class="filter-checkbox" value="Audioregie" />
+          Audioregie
+        </label>
+      </div>
+    </div>
+
+    <div id="locationsList" class="locations"></div>
+
+    <!-- Bericht als geen resultaten -->
+    <div id="noResults" class="no-results" style="display: none">
+      Geen locaties gevonden. Probeer andere zoekwoorden of filters.
+    </div>
+  </div>
+
+  <script src="js/index.js" defer></script>
+</body>
+
+</html>

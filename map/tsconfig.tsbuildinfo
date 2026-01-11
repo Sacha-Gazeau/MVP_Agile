@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/detailspanel.tsx","./src/components/locationcard.tsx","./src/components/locationlist.tsx","./src/components/map.tsx","./src/hooks/uselocations.ts","./src/services/locationservice.ts","./src/types/location.ts"],"version":"5.9.3"}
