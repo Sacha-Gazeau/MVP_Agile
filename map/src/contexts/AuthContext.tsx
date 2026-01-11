@@ -3,14 +3,16 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 interface AuthContextType {
   userId: string;
   isAdmin: boolean;
-  loginRequests: number; 
+  loginRequests: number;
   loginAsAdmin: (password: string) => boolean;
   logoutAdmin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [userId, setUserId] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [loginRequests, setLoginRequests] = useState(0);
@@ -19,7 +21,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Guest User Logic
     let storedUserId = localStorage.getItem("app_user_id");
     if (!storedUserId) {
-      storedUserId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      storedUserId = `guest-${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
       localStorage.setItem("app_user_id", storedUserId);
     }
     setUserId(storedUserId);
@@ -45,7 +49,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ userId, isAdmin, loginAsAdmin, logoutAdmin, loginRequests }}>
+    <AuthContext.Provider
+      value={{ userId, isAdmin, loginAsAdmin, logoutAdmin, loginRequests }}
+    >
       {children}
     </AuthContext.Provider>
   );
