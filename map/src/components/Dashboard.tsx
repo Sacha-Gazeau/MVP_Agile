@@ -46,7 +46,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24 overflow-y-auto transition-colors">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 pb-24 overflow-y-auto transition-colors">
       {/* Header */}
       <div className="px-4 py-6 sm:px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

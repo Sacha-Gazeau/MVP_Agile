@@ -4,6 +4,7 @@ import {
   LocationType,
 } from "../types/location";
 import axios from "axios";
+import { checkInService } from "./checkInService";
 const mockLocations: StudyLocation[] = [
   {
     id: "1",
@@ -234,12 +235,23 @@ export const locationService = {
               address = `${record.straatnaam}, Gent`;
             }
 
+            const id = (
+              record.id ??
+              record.objectid ??
+              `location-${index}`
+            ).toString();
+
+            let currentOccupancy =
+              typeof record.gereserveerde_plaatsen !== "undefined"
+                ? Number(record.gereserveerde_plaatsen)
+                : 0;
+
+            // Add local check-ins to occupancy
+            const localOccupancy = checkInService.getCurrentOccupancy(id);
+            currentOccupancy += localOccupancy;
+
             return {
-              id: (
-                record.id ??
-                record.objectid ??
-                `location-${index}`
-              ).toString(),
+              id,
               name: record.titel || record.naam || "Study Location",
               description:
                 record.teaser_text ||
@@ -251,10 +263,7 @@ export const locationService = {
               capacity: record.totale_capaciteit
                 ? Number(record.totale_capaciteit)
                 : undefined,
-              currentOccupancy:
-                typeof record.gereserveerde_plaatsen !== "undefined"
-                  ? Number(record.gereserveerde_plaatsen)
-                  : undefined,
+              currentOccupancy,
               openingHours: record.openingsuren || null,
               amenities: record.voorzieningen
                 ? record.voorzieningen.split(",").map((a: string) => a.trim())
