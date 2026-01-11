@@ -5,6 +5,7 @@ import { checkInService } from "../services/checkInService";
 import { gamificationService } from "../services/gamificationService";
 import { locationService } from "../services/locationService";
 import { CheckIn } from "../types/checkin";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QRScannerProps {
   onCheckInSuccess?: (checkIn: CheckIn) => void;
@@ -132,111 +133,138 @@ export function QRScanner({ onCheckInSuccess, onClose }: QRScannerProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 pb-24 transition-colors">
-      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-gray-700"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             📷 QR Check-in
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full p-2 transition-colors active:scale-95"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full p-2 transition-colors active:scale-95"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
 
-        {activeCheckIn && !isScanning && (
-          <div className="mb-4 sm:mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg">
-                  ✅ Currently Checked In
-                </p>
-                <p className="text-green-600 dark:text-green-400 text-sm">
-                  Since{" "}
-                  {new Date(activeCheckIn.timestamp).toLocaleTimeString(
-                    "nl-BE",
-                    { hour: "2-digit", minute: "2-digit" }
-                  )}
-                </p>
+        <AnimatePresence mode="wait">
+          {activeCheckIn && !isScanning && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white text-base sm:text-lg">
+                    ✅ Currently Checked In
+                  </p>
+                  <p className="text-green-600 dark:text-green-400 text-sm">
+                    Since{" "}
+                    {new Date(activeCheckIn.timestamp).toLocaleTimeString(
+                      "nl-BE",
+                      { hour: "2-digit", minute: "2-digit" }
+                    )}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCheckOut}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-500/20"
+                >
+                  Check Out
+                </button>
               </div>
-              <button
-                onClick={handleCheckOut}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 active:scale-95 transition-all"
-              >
-                Check Out
-              </button>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {!activeCheckIn && (
           <>
             <div
               id="qr-reader"
-              className="mb-4 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700"
+              className="mb-4 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 border-2 border-gray-100 dark:border-gray-600"
               style={{ minHeight: isScanning ? "280px" : "0" }}
-            ></div>
+            >
+              {isScanning && (
+                <div className="absolute inset-0 border-2 border-blue-500/50 rounded-xl pointer-events-none animate-pulse z-10"></div>
+              )}
+            </div>
 
-            {message && (
-              <div
-                className={`mb-4 p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base ${
-                  messageType === "success"
-                    ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800"
-                    : messageType === "error"
-                    ? "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800"
-                    : "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
-                }`}
-              >
-                {message}
-              </div>
-            )}
+            <AnimatePresence>
+              {message && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className={`mb-4 p-4 rounded-xl text-center text-sm sm:text-base font-medium ${
+                    messageType === "success"
+                      ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800"
+                      : messageType === "error"
+                      ? "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800"
+                      : "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+                  }`}
+                >
+                  {message}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {!isScanning ? (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={startScanning}
-                className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-all font-medium text-base sm:text-lg"
+                className="w-full px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold text-lg shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
               >
-                📷 Start Camera & Scan
-              </button>
+                <span>📷</span> Start Camera & Scan
+              </motion.button>
             ) : (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={stopScanning}
-                className="w-full px-6 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 active:scale-95 transition-all font-medium text-base sm:text-lg"
+                className="w-full px-6 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold text-lg transition-all flex items-center justify-center gap-2"
               >
-                ⏹️ Stop Scanning
-              </button>
+                <span>⏹️</span> Stop Scanning
+              </motion.button>
             )}
 
-            <div className="mt-4 sm:mt-6 space-y-2">
-              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
-                <span className="text-lg sm:text-xl">🎯</span>
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                <span className="text-xl">🎯</span>
                 <span>Find the QR code at the study location</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
-                <span className="text-lg sm:text-xl">📱</span>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                <span className="text-xl">📱</span>
                 <span>Point your camera at the code</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
-                <span className="text-lg sm:text-xl">🏆</span>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                <span className="text-xl">🏆</span>
                 <span>Earn XP & badges automatically!</span>
               </div>
             </div>
           </>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

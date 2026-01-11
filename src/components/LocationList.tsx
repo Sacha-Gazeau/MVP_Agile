@@ -1,6 +1,8 @@
+// ...existing code...
 import React from "react";
 import { StudyLocation } from "../types/location";
 import { LocationCard } from "./LocationCard";
+import { motion } from "framer-motion";
 
 interface LocationListProps {
   locations: StudyLocation[];
@@ -15,6 +17,24 @@ export const LocationList: React.FC<LocationListProps> = ({
   onSelectLocation,
   isLoading,
 }) => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -40,18 +60,24 @@ export const LocationList: React.FC<LocationListProps> = ({
         </p>
       </div>
 
-      <div className="p-3 sm:p-4 space-y-3">
+      <motion.div
+        className="p-3 sm:p-4 space-y-3"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {locations.length === 0 ? (
-          <div className="text-center py-8">
+          <motion.div variants={itemVariants} className="text-center py-8">
             <div className="text-4xl mb-3">🔍</div>
             <p className="text-gray-500 dark:text-gray-400">
               No study locations found
             </p>
-          </div>
+          </motion.div>
         ) : (
           locations.map((location) => (
-            <div
+            <motion.div
               key={location.id}
+              variants={itemVariants}
               className={`rounded-xl border-2 transition-all active:scale-[0.98] ${
                 selectedLocation?.id === location.id
                   ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm"
@@ -59,10 +85,10 @@ export const LocationList: React.FC<LocationListProps> = ({
               }`}
             >
               <LocationCard location={location} onSelect={onSelectLocation} />
-            </div>
+            </motion.div>
           ))
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };
