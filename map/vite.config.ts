@@ -3,6 +3,10 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  server: {
+    host: true, // Enables network access so you can test on your phone
+    port: 5173,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -11,7 +15,8 @@ export default defineConfig({
       manifest: {
         name: "Study Locator - Find Silent Study Spaces",
         short_name: "Study Locator",
-        description: "Discover peaceful locations where you can study in silence",
+        description:
+          "Discover peaceful locations where you can study in silence",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",

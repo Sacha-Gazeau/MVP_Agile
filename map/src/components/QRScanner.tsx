@@ -131,16 +131,18 @@ export function QRScanner({ onCheckInSuccess, onClose }: QRScannerProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">QR Check-in</h2>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 pb-24 transition-colors">
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            📷 QR Check-in
+          </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full p-2 transition-colors active:scale-95"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -156,14 +158,14 @@ export function QRScanner({ onCheckInSuccess, onClose }: QRScannerProps) {
         </div>
 
         {activeCheckIn && !isScanning && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center justify-between">
+          <div className="mb-4 sm:mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <p className="font-semibold text-green-900">
-                  Momenteel ingecheckt
+                <p className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg">
+                  ✅ Currently Checked In
                 </p>
-                <p className="text-sm text-green-700">
-                  Sinds{" "}
+                <p className="text-green-600 dark:text-green-400 text-sm">
+                  Since{" "}
                   {new Date(activeCheckIn.timestamp).toLocaleTimeString(
                     "nl-BE",
                     { hour: "2-digit", minute: "2-digit" }
@@ -172,9 +174,9 @@ export function QRScanner({ onCheckInSuccess, onClose }: QRScannerProps) {
               </div>
               <button
                 onClick={handleCheckOut}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 active:scale-95 transition-all"
               >
-                Check uit
+                Check Out
               </button>
             </div>
           </div>
@@ -184,17 +186,18 @@ export function QRScanner({ onCheckInSuccess, onClose }: QRScannerProps) {
           <>
             <div
               id="qr-reader"
-              className="mb-4 rounded-lg overflow-hidden"
+              className="mb-4 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700"
+              style={{ minHeight: isScanning ? "280px" : "0" }}
             ></div>
 
             {message && (
               <div
-                className={`mb-4 p-3 rounded-lg ${
+                className={`mb-4 p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base ${
                   messageType === "success"
-                    ? "bg-green-50 text-green-900 border border-green-200"
+                    ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800"
                     : messageType === "error"
-                    ? "bg-red-50 text-red-900 border border-red-200"
-                    : "bg-blue-50 text-blue-900 border border-blue-200"
+                    ? "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800"
+                    : "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
                 }`}
               >
                 {message}
@@ -204,23 +207,32 @@ export function QRScanner({ onCheckInSuccess, onClose }: QRScannerProps) {
             {!isScanning ? (
               <button
                 onClick={startScanning}
-                className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
+                className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-all font-medium text-base sm:text-lg"
               >
-                📷 Start Scannen
+                📷 Start Camera & Scan
               </button>
             ) : (
               <button
                 onClick={stopScanning}
-                className="w-full px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold"
+                className="w-full px-6 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 active:scale-95 transition-all font-medium text-base sm:text-lg"
               >
-                Stop Scannen
+                ⏹️ Stop Scanning
               </button>
             )}
 
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• Zoek de QR code bij de studielocatie</p>
-              <p>• Houd je camera stabiel</p>
-              <p>• Check automatisch in na scannen</p>
+            <div className="mt-4 sm:mt-6 space-y-2">
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
+                <span className="text-lg sm:text-xl">🎯</span>
+                <span>Find the QR code at the study location</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
+                <span className="text-lg sm:text-xl">📱</span>
+                <span>Point your camera at the code</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
+                <span className="text-lg sm:text-xl">🏆</span>
+                <span>Earn XP & badges automatically!</span>
+              </div>
             </div>
           </>
         )}
