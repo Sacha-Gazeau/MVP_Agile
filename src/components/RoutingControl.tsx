@@ -22,7 +22,6 @@ export const RoutingControl = ({
   useEffect(() => {
     if (!userLocation || !destination) return;
 
-    // Remove previous control
     if (routingControl) {
       map.removeControl(routingControl);
     }
@@ -37,7 +36,7 @@ export const RoutingControl = ({
       routeWhileDragging: true,
       showAlternatives: true,
       fitSelectedRoutes: true,
-      show: false, // We hide the default text instructions container to build our own or keep it minimal
+      show: false,
       addWaypoints: false,
       draggableWaypoints: false,
       lineOptions: {
@@ -56,7 +55,6 @@ export const RoutingControl = ({
 
     setRoutingControl(control);
 
-    // Cleanup
     return () => {
       if (control) {
         map.removeControl(control);

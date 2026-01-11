@@ -19,7 +19,8 @@ export default defineConfig({
       manifest: {
         name: "Study Locator - Find Silent Study Spaces",
         short_name: "Study Locator",
-        description: "Discover peaceful locations where you can study in silence",
+        description:
+          "Discover peaceful locations where you can study in silence",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",
@@ -39,4 +40,3 @@ export default defineConfig({
     }),
   ],
 });
-
